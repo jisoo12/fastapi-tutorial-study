@@ -1,7 +1,7 @@
 from typing import Optional, List
 from enum import Enum
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Path
 from pydantic import BaseModel
 
 
@@ -44,15 +44,13 @@ async def read_user_item(
 
 
 @app.get("/items/{item_id}")
-async def read_item(item_id: str, q: Optional[str] = None, short: bool = False):
-    item = {"item_id": item_id}
+async def read_items(
+    *, item_id: int = Path(..., title="The ID of the item to get", ge=1), q: str
+):
+    results = {"item_id": item_id}
     if q:
-        return item.update({"q": q})
-    if not short:
-        item.update(
-            {"description": "This is an amazing item that has a long description."}
-        )
-    return item
+        results.update({"q": q})
+    return results
 
 
 @app.get("/items/")
